@@ -13,9 +13,8 @@
 #define USART1_PORT GPIOA
 #define USART1_BAUDRATE 115200
 
-#define DMA_TX 0
-#define DMA_RX 1
-extern void Default_Handler(void);
+#define DMA_TX 1
+#define DMA_RX 0
 
 
 /**
@@ -28,7 +27,7 @@ extern void Default_Handler(void);
  * настройки DMA, очищаем настройки DMA  и настраиваем DMA как автоинкремент в памяти  с
  * направлением память->устройство (п. 13.3.3 RM0008)
  */ 
-void UartInit(void)
+void Uart1Init(void)
 {
 	RCC->APB2ENR |= RCC_APB2ENR_USART1EN | RCC_APB2ENR_IOPAEN;
 	USART1->CR1 &= ~USART_CR1_UE;
@@ -37,22 +36,10 @@ void UartInit(void)
 	USART1->BRR = F_CPU / USART1_BAUDRATE;
 	USART1->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE;
 
-#if DMA_TX != 0
-	USART1->CR3 |= USART_CR3_DMAT;
-	RCC->AHBENR |= RCC_AHBENR_DMA1EN;
-	DMA1_Channel4->CPAR = (uint32_t)&USART1->DR;
-	DMA1_Channel4->CCR &= ~0x1FFF;
-	DMA1_Channel4->CCR |= DMA_CCR_MINC | DMA_CCR_DIR;
-#endif
-
-#if DMA_RX != 0
-	USART1->CR3 |= USART_CR3_DMAR;
-	RCC->AHBENR |= RCC_AHBENR_DMA1EN;
-	//DMA1_Channel5->CPAR = (uint32_t)&USART1->DR;
-//	DMA1_Channel5->CCR &= ~0x1FFF;
-//	DMA1_Channel5->CCR |= DMA_CCR_MINC | DMA_CCR_DIR;
-#endif
-	DmaConfigureChannel(DMA1_Channel5, DmaModePeriphToMem, DmaPriorityHigh,DmaSizeConfMem8bitPeriph8bit, DmaIncrementModeIncMem);
-	DmaSetPeripheralRegister(DMA1_Channel5, USART1->DR);
-	DmaClockEnable(DMA1_Channel5);
+	USART1->CR3 = USART_CR3_DMAT | USART_CR3_DMAR;
+	Dma1ClockEnable();
+	DmaConfigureChannel(DMA1_Channel4, DmaModeMemToPeriph, DmaPriorityMedium, DmaSizeConfMem8bitPeriph8bit, DmaIncrementModeIncMem);
+	DmaSetPeripheralRegister(DMA1_Channel4, &USART1->DR);
+	DmaConfigureChannel(DMA1_Channel5, DmaModePeriphToMem, DmaPriorityHigh, DmaSizeConfMem8bitPeriph8bit, DmaIncrementModeIncMem);
+	DmaSetPeripheralRegister(DMA1_Channel5, &USART1->DR);
 }

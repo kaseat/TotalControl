@@ -1,10 +1,10 @@
-#pragma once
+п»ї#pragma once
 #include <stm32f103xb.h>
 #include <sys/_stdint.h>
 
 /**
- * \brief todo: добавить описание
- */
+ * \brief Р РµР¶РёРј СЂР°Р±РѕС‚С‹ DMA
+ */ 
 typedef enum
 {
 	DmaModePeriphToMem = 0 << 4,
@@ -13,8 +13,8 @@ typedef enum
 }DmaMode;
 
 /**
- * \brief todo: добавить описание
- */
+ * \brief РџСЂРёРѕСЂРёС‚РµС‚ РєР°РЅР°Р»Р° DMA
+ */ 
 typedef enum
 {
 	DmaPriorityLow      = 0 << 12,
@@ -23,29 +23,10 @@ typedef enum
 	DmaPriorityVeryHigh = 3 << 12
 }DmaPriority;
 
-/**
- * \brief todo: добавить описание
- */
-typedef enum
-{
-	DmaMemorySize8bit   = 0 << 10,
-	DmaMemorySize16bits = 1 << 10,
-	DmaMemorySize32bits = 2 << 10
-}DmaMemorySize;
 
 /**
- * \brief todo: добавить описание
- */
-typedef enum
-{
-	DmaPeripheralSize8bit   = 0 << 8,
-	DmaPeripheralSize16bits = 1 << 8,
-	DmaPeripheralSize32bits = 2 << 8
-}DmaPeripheralSize;
-
-/**
- * \brief todo: добавить описание
- */
+ * \brief Р Р°Р·РјРµСЂ РґР°РЅРЅС‹С… РїСЂРёС‘РјРЅРёРєР° Рё РїРµСЂРµРґР°С‚С‡РёРєР° (СЃРј Рї.13.3.4 RM0008).
+ */ 
 typedef enum
 {
 	DmaSizeConfMem8bitPeriph8bit     = 0 << 10 | 0 << 8,
@@ -62,8 +43,8 @@ typedef enum
 }DmaSizeConf;
 
 /**
- * \brief Режим автоинкремента адресов приёмника и передатчика (см п.13.4.3)
- */
+ * \brief Р РµР¶РёРј Р°РІС‚РѕРёРЅРєСЂРµРјРµРЅС‚Р° Р°РґСЂРµСЃРѕРІ РїСЂРёС‘РјРЅРёРєР° Рё РїРµСЂРµРґР°С‚С‡РёРєР° (СЃРј Рї.13.4.3 RM0008).
+ */ 
 typedef enum
 {
 	DmaIncrementModeIncOff          = 0 << 6,
@@ -73,18 +54,18 @@ typedef enum
 }DmaIncrementMode;
 
 /**
- * \brief Канал DMA, для абстаргирования от типов данных CMSIS.
- */
+ * \brief РљР°РЅР°Р» DMA, РґР»СЏ Р°Р±СЃС‚Р°СЂРіРёСЂРѕРІР°РЅРёСЏ РѕС‚ С‚РёРїРѕРІ РґР°РЅРЅС‹С… CMSIS.
+ */ 
 typedef DMA_Channel_TypeDef DmaChannel;
 
 /**
- * \brief Функция настройки канала DMA.
- * \param dma Канал DMA, который будем настраивать.
- * \param mode Режим передачи данных.
- * \param priority Приоритет канала.
- * \param size Размер данных приёмника и отправителя.
- * \param incMode Настройки автоинкремента адресов.
- */
+ * \brief Р¤СѓРЅРєС†РёСЏ РЅР°СЃС‚СЂРѕР№РєРё РєР°РЅР°Р»Р° DMA.
+ * \param dma РљР°РЅР°Р» DMA, РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµРј РЅР°СЃС‚СЂР°РёРІР°С‚СЊ.
+ * \param mode Р РµР¶РёРј РїРµСЂРµРґР°С‡Рё РґР°РЅРЅС‹С….
+ * \param priority РџСЂРёРѕСЂРёС‚РµС‚ РєР°РЅР°Р»Р°.
+ * \param size Р Р°Р·РјРµСЂ РґР°РЅРЅС‹С… РїСЂРёС‘РјРЅРёРєР° Рё РѕС‚РїСЂР°РІРёС‚РµР»СЏ.
+ * \param incMode РќР°СЃС‚СЂРѕР№РєРё Р°РІС‚РѕРёРЅРєСЂРµРјРµРЅС‚Р° Р°РґСЂРµСЃРѕРІ.
+ */ 
 inline void DmaConfigureChannel(DmaChannel* dma, DmaMode mode, DmaPriority priority, DmaSizeConf size, DmaIncrementMode incMode)
 {
 	dma->CCR &= ~0x1FFF;
@@ -92,19 +73,29 @@ inline void DmaConfigureChannel(DmaChannel* dma, DmaMode mode, DmaPriority prior
 }
 
 /**
- * \brief todo: добавить описание
- * \param dma 
- * \param addr 
- */
-inline void DmaSetPeripheralRegister(DmaChannel* dma, uint32_t addr)
+ * \brief РЈСЃС‚Р°РЅРѕРІРєР° Р°РґСЂРµСЃР° СЂРµРіРёСЃС‚СЂР° РїРµСЂРµС„РёСЂРёРё, РѕС‚РєСѓРґР°/РєСѓРґР° Р±СЂР°С‚СЊ/РєР»Р°СЃС‚СЊ РґР°РЅРЅС‹Рµ.
+ * \param dma РљР°РЅР°Р» DMA, РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµРј РЅР°СЃС‚СЂР°РёРІР°С‚СЊ.
+ * \param addr РђРґСЂРµСЃ СЂРµРіРёСЃС‚СЂР°.
+ */ 
+inline void DmaSetPeripheralRegister(DmaChannel* dma, volatile uint32_t* addr)
 {
-	dma->CPAR = (uint32_t)&addr;
+	dma->CPAR = (uint32_t)addr;
 }
 
 /**
- * \brief Разрешить тактирование блока DMA1
- */
-inline void DmaClockEnable()
+ * \brief РЈСЃС‚Р°РЅРѕРІРєР° Р°РґСЂРµСЃР° СЂРµРіРёСЃС‚СЂР° РІ РїР°РјСЏС‚Рё, РѕС‚РєСѓРґР°/РєСѓРґР° Р±СЂР°С‚СЊ/РєР»Р°СЃС‚СЊ РґР°РЅРЅС‹Рµ.
+ * \param dma РљР°РЅР°Р» DMA, РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµРј РЅР°СЃС‚СЂР°РёРІР°С‚СЊ.
+ * \param addr РђРґСЂРµСЃ СЂРµРіРёСЃС‚СЂР°.
+ */ 
+inline void DmaSetMemoryRegister(DmaChannel* dma, volatile uint32_t* addr)
+{
+	dma->CMAR = (uint32_t)addr;
+}
+
+/**
+ * \brief Р Р°Р·СЂРµС€РёС‚СЊ С‚Р°РєС‚РёСЂРѕРІР°РЅРёРµ Р±Р»РѕРєР° DMA1
+ */ 
+inline void Dma1ClockEnable()
 {
 	RCC->AHBENR |= RCC_AHBENR_DMA1EN;
 }
